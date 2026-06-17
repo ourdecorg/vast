@@ -199,6 +199,31 @@ export interface RevenueEvent {
   created_at: string;
 }
 
+// ─── Telegram Integration ────────────────────────────────────────────────────
+
+export interface ParticipantTelegramAccount {
+  id: string;
+  participant_id: string;
+  telegram_user_id: number;
+  telegram_username?: string;
+  telegram_first_name?: string;
+  created_at: string;
+}
+
+export type ContributionReactionType = 'emoji' | 'reply';
+
+export interface ContributionReaction {
+  id: string;
+  contribution_id: string;
+  telegram_user_id: number;
+  telegram_username?: string;
+  reaction_type: ContributionReactionType;
+  emoji?: string;        // set when reaction_type = 'emoji'
+  reply_text?: string;   // set when reaction_type = 'reply'
+  telegram_message_id?: number;
+  created_at: string;
+}
+
 // --- Calculation result types ---
 
 // One line in a distribution calculation, linked back to the rule that caused it
