@@ -26,6 +26,18 @@ export interface TelegramMessage {
   reply_to_message?: TelegramMessage;
 }
 
+export interface TelegramInlineKeyboardButton {
+  text: string;
+  callback_data: string;
+}
+
+export interface TelegramCallbackQuery {
+  id: string;
+  from: TelegramUser;
+  message?: TelegramMessage;
+  data?: string;
+}
+
 export interface TelegramReactionType {
   type: 'emoji' | 'custom_emoji';
   emoji?: string;
@@ -44,6 +56,7 @@ export interface TelegramMessageReaction {
 export interface TelegramUpdate {
   update_id: number;
   message?: TelegramMessage;
+  callback_query?: TelegramCallbackQuery;
   message_reaction?: TelegramMessageReaction;
 }
 
@@ -77,6 +90,64 @@ export async function sendTelegramMessage(
   return json.result as TelegramMessage;
 }
 
+// Send a message with an Inline Keyboard.
+// buttons is a 2D array: outer = rows, inner = columns.
+export async function sendMessageWithKeyboard(
+  chatId: number,
+  text: string,
+  buttons: TelegramInlineKeyboardButton[][],
+): Promise<TelegramMessage> {
+  const res = await fetch(`${TELEGRAM_API_BASE}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text,
+      parse_mode: 'HTML',
+      reply_markup: { inline_keyboard: buttons },
+    }),
+  });
+
+  const json = await res.json();
+  if (!json.ok) throw new Error(`Telegram sendMessageWithKeyboard failed: ${json.description}`);
+  return json.result as TelegramMessage;
+}
+
+// Edit an existing bot message in-place (used to advance wizard steps without extra noise).
+export async function editMessageWithKeyboard(
+  chatId: number,
+  messageId: number,
+  text: string,
+  buttons: TelegramInlineKeyboardButton[][],
+): Promise<void> {
+  const res = await fetch(`${TELEGRAM_API_BASE}/editMessageText`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      message_id: messageId,
+      text,
+      parse_mode: 'HTML',
+      reply_markup: { inline_keyboard: buttons },
+    }),
+  });
+
+  const json = await res.json();
+  // Telegram returns false (not an error) when the message content didn't change — ignore that.
+  if (!json.ok && json.description !== 'Bad Request: message is not modified') {
+    throw new Error(`Telegram editMessageWithKeyboard failed: ${json.description}`);
+  }
+}
+
+// Must be called after every callback_query to dismiss the loading spinner on the button.
+export async function answerCallbackQuery(callbackQueryId: string, text?: string): Promise<void> {
+  await fetch(`${TELEGRAM_API_BASE}/answerCallbackQuery`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ callback_query_id: callbackQueryId, text }),
+  });
+}
+
 export async function setWebhook(webhookUrl: string): Promise<void> {
   const res = await fetch(`${TELEGRAM_API_BASE}/setWebhook`, {
     method: 'POST',
@@ -84,7 +155,7 @@ export async function setWebhook(webhookUrl: string): Promise<void> {
     body: JSON.stringify({
       url: webhookUrl,
       secret_token: process.env.TELEGRAM_WEBHOOK_SECRET,
-      allowed_updates: ['message', 'message_reaction'],
+      allowed_updates: ['message', 'callback_query', 'message_reaction'],
     }),
   });
   const json = await res.json();
@@ -126,30 +197,6 @@ export function formatContributionAnnouncement(contribution: {
   ]
     .filter((line) => line !== null)
     .join('\n');
-}
-
-// ─── Command Parsing ──────────────────────────────────────────────────────────
-
-export function parseContributionCommand(text: string): {
-  description: string;
-  amount: number;
-  unit?: string;
-} {
-  // Strip the /contribute command prefix (handles /contribute@botname too)
-  const body = text.replace(/^\/contribute(?:@\S+)?\s*/i, '').trim();
-
-  // Try to extract a leading number (e.g. "8 שעות כתיבה" → amount=8, rest=description)
-  const numberMatch = body.match(/^(\d+(?:\.\d+)?)\s+(\S+)\s+(.*)/);
-  if (numberMatch) {
-    return {
-      amount: parseFloat(numberMatch[1]),
-      unit: numberMatch[2],
-      description: numberMatch[3].trim(),
-    };
-  }
-
-  // Fallback: treat everything as description, default amount=1
-  return { amount: 1, description: body || 'תרומה מטלגרם' };
 }
 
 // ─── User Display ─────────────────────────────────────────────────────────────
