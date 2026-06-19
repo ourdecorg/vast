@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { apiFetch } from '@/lib/apiFetch';
 import SectionHeading from '@/components/SectionHeading';
 import Badge from '@/components/Badge';
 import type { Participant, Archetype } from '@/types/domain';
@@ -28,8 +29,8 @@ export default function ParticipantsPage() {
 
   async function load() {
     const [partRes, archRes] = await Promise.all([
-      fetch(`/api/projects/${id}/participants`),
-      fetch('/api/archetypes'),
+      apiFetch(`/api/projects/${id}/participants`),
+      apiFetch('/api/archetypes'),
     ]);
     const [parts, archs] = await Promise.all([partRes.json(), archRes.json()]);
     setParticipants(Array.isArray(parts) ? parts : []);
@@ -51,7 +52,7 @@ export default function ParticipantsPage() {
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
     setAddSaving(true);
-    await fetch(`/api/projects/${id}/participants`, {
+    await apiFetch(`/api/projects/${id}/participants`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(addForm),
@@ -77,7 +78,7 @@ export default function ParticipantsPage() {
     e.preventDefault();
     if (!editingId) return;
     setEditSaving(true);
-    await fetch(`/api/projects/${id}/participants/${editingId}`, {
+    await apiFetch(`/api/projects/${id}/participants/${editingId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editForm),
@@ -89,7 +90,7 @@ export default function ParticipantsPage() {
 
   async function handleDelete(participantId: string) {
     if (!confirm('Remove this participant? This cannot be undone.')) return;
-    await fetch(`/api/projects/${id}/participants/${participantId}`, { method: 'DELETE' });
+    await apiFetch(`/api/projects/${id}/participants/${participantId}`, { method: 'DELETE' });
     await load();
   }
 

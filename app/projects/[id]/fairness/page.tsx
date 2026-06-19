@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { apiFetch } from '@/lib/apiFetch';
 import SectionHeading from '@/components/SectionHeading';
 import Badge from '@/components/Badge';
 import type { FairnessMapEntry } from '@/types/domain';
@@ -41,8 +42,8 @@ export default function FairnessPage() {
   useEffect(() => {
     async function load() {
       const [fmRes, projRes] = await Promise.all([
-        fetch(`/api/projects/${id}/fairness-map`),
-        fetch(`/api/projects/${id}`),
+        apiFetch(`/api/projects/${id}/fairness-map`),
+        apiFetch(`/api/projects/${id}`),
       ]);
       const [fm, proj] = await Promise.all([fmRes.json(), projRes.json()]);
       setEntries(Array.isArray(fm) ? fm : []);

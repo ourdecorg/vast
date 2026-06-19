@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/apiFetch';
 import type { Project } from '@/types/domain';
 
 const PROJECT_TYPES = ['film', 'software', 'art', 'community', 'research', 'education', 'other'];
@@ -23,7 +24,7 @@ export default function ProjectsPage() {
 
   async function loadProjects() {
     setLoading(true);
-    const res = await fetch('/api/projects');
+    const res = await apiFetch('/api/projects');
     const data = await res.json();
     setProjects(Array.isArray(data) ? data : []);
     setLoading(false);
@@ -34,7 +35,7 @@ export default function ProjectsPage() {
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    await fetch('/api/projects', {
+    await apiFetch('/api/projects', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
@@ -47,7 +48,7 @@ export default function ProjectsPage() {
 
   async function handleSeed() {
     setSeeding(true);
-    const res = await fetch('/api/seed', { method: 'POST' });
+    const res = await apiFetch('/api/seed', { method: 'POST' });
     const data = await res.json();
     alert(data.message);
     await loadProjects();
@@ -92,7 +93,7 @@ export default function ProjectsPage() {
           <div className="mb-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <h3 className="font-semibold text-gray-900 mb-4">New Project</h3>
             <form onSubmit={handleCreate} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-medium text-gray-700 mb-1">Project Name *</label>
                 <input
                   required
@@ -102,7 +103,7 @@ export default function ProjectsPage() {
                   placeholder="e.g. The Last Summer"
                 />
               </div>
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
                 <textarea
                   value={form.description}
@@ -133,7 +134,7 @@ export default function ProjectsPage() {
                   {['USD','EUR','GBP','JPY','CAD','AUD'].map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
-              <div className="col-span-2 flex gap-3 justify-end">
+              <div className="sm:col-span-2 flex gap-3 justify-end">
                 <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">
                   Cancel
                 </button>

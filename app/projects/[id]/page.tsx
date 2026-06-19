@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/apiFetch';
 import StatCard from '@/components/StatCard';
 import Badge from '@/components/Badge';
 import type { Project, LedgerEvent } from '@/types/domain';
@@ -37,11 +38,11 @@ export default function ProjectDashboard() {
   useEffect(() => {
     async function load() {
       const [projRes, partRes, contribRes, ledgerRes, payRes] = await Promise.all([
-        fetch(`/api/projects/${id}`),
-        fetch(`/api/projects/${id}/participants`),
-        fetch(`/api/projects/${id}/contributions`),
-        fetch(`/api/projects/${id}/ledger?limit=8`),
-        fetch(`/api/projects/${id}/payments`),
+        apiFetch(`/api/projects/${id}`),
+        apiFetch(`/api/projects/${id}/participants`),
+        apiFetch(`/api/projects/${id}/contributions`),
+        apiFetch(`/api/projects/${id}/ledger?limit=8`),
+        apiFetch(`/api/projects/${id}/payments`),
       ]);
       const [proj, parts, contribs, ledger, pays] = await Promise.all([
         projRes.json(), partRes.json(), contribRes.json(), ledgerRes.json(), payRes.json(),
@@ -76,7 +77,7 @@ export default function ProjectDashboard() {
   async function saveEdit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const res = await fetch(`/api/projects/${id}`, {
+    const res = await apiFetch(`/api/projects/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editForm),

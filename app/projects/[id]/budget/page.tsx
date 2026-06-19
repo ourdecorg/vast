@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { apiFetch } from '@/lib/apiFetch';
 import StatCard from '@/components/StatCard';
 import SectionHeading from '@/components/SectionHeading';
 import type { Budget } from '@/types/domain';
@@ -18,8 +19,8 @@ export default function BudgetPage() {
   useEffect(() => {
     async function load() {
       const [budRes, projRes] = await Promise.all([
-        fetch(`/api/projects/${id}/budget`),
-        fetch(`/api/projects/${id}`),
+        apiFetch(`/api/projects/${id}/budget`),
+        apiFetch(`/api/projects/${id}`),
       ]);
       const [bud, proj] = await Promise.all([budRes.json(), projRes.json()]);
       setBudget(bud);
@@ -40,7 +41,7 @@ export default function BudgetPage() {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const res = await fetch(`/api/projects/${id}/budget`, {
+    const res = await apiFetch(`/api/projects/${id}/budget`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...form, currency }),
@@ -117,7 +118,7 @@ export default function BudgetPage() {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
             </div>
-            <div className="col-span-2 flex justify-end gap-3">
+            <div className="sm:col-span-2 flex justify-end gap-3">
               <button type="button" onClick={() => setEditing(false)} className="px-4 py-2 text-sm text-gray-600">Cancel</button>
               <button type="submit" disabled={saving} className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
                 {saving ? 'Saving…' : 'Save Budget'}

@@ -42,29 +42,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     }
   }, [loading, session, pathname]);
 
-  // Patch window.fetch to attach Authorization header for all /api/ calls
-  useEffect(() => {
-    if (!session) return;
-    const token = session.access_token;
-    const original = window.fetch;
-
-    window.fetch = function patchedFetch(input, init = {}) {
-      const url =
-        typeof input === 'string' ? input
-        : input instanceof URL ? input.href
-        : (input as Request).url;
-
-      if (url.startsWith('/api/')) {
-        const headers = new Headers((init as RequestInit).headers);
-        headers.set('Authorization', `Bearer ${token}`);
-        init = { ...init, headers } as RequestInit;
-      }
-      return original.call(window, input, init as RequestInit);
-    };
-
-    return () => { window.fetch = original; };
-  }, [session?.access_token]);
-
   async function signOut() {
     const supabase = getSupabaseClient();
     await supabase.auth.signOut();

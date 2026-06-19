@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { apiFetch } from '@/lib/apiFetch';
 import SectionHeading from '@/components/SectionHeading';
 import Badge from '@/components/Badge';
 import type { CompensationRule, Participant } from '@/types/domain';
@@ -40,9 +41,9 @@ export default function CompensationPage() {
 
   async function load() {
     const [ruleRes, partRes, projRes] = await Promise.all([
-      fetch(`/api/projects/${id}/compensation-rules`),
-      fetch(`/api/projects/${id}/participants`),
-      fetch(`/api/projects/${id}`),
+      apiFetch(`/api/projects/${id}/compensation-rules`),
+      apiFetch(`/api/projects/${id}/participants`),
+      apiFetch(`/api/projects/${id}`),
     ]);
     const [ruleData, partData, projData] = await Promise.all([ruleRes.json(), partRes.json(), projRes.json()]);
     setRules(Array.isArray(ruleData) ? ruleData : []);
@@ -67,7 +68,7 @@ export default function CompensationPage() {
       description: form.description,
       conditions: form.min_revenue ? { min_revenue: Number(form.min_revenue) } : {},
     };
-    await fetch(`/api/projects/${id}/compensation-rules`, {
+    await apiFetch(`/api/projects/${id}/compensation-rules`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -81,7 +82,7 @@ export default function CompensationPage() {
   async function handleSimulate() {
     if (!simRevenue) return;
     setSimLoading(true);
-    const res = await fetch(`/api/projects/${id}/calculate`, {
+    const res = await apiFetch(`/api/projects/${id}/calculate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ revenue_amount: Number(simRevenue) }),
@@ -135,7 +136,7 @@ export default function CompensationPage() {
                 {RULE_TYPES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
               </select>
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label className="block text-xs font-medium text-gray-700 mb-1">Label *</label>
               <input
                 required value={form.label}
@@ -183,7 +184,7 @@ export default function CompensationPage() {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
               <input
                 value={form.description}
@@ -191,7 +192,7 @@ export default function CompensationPage() {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
             </div>
-            <div className="col-span-2 flex justify-end gap-3">
+            <div className="sm:col-span-2 flex justify-end gap-3">
               <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-gray-600">Cancel</button>
               <button type="submit" disabled={saving} className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
                 {saving ? 'Saving…' : 'Add Rule'}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { apiFetch } from '@/lib/apiFetch';
 import SectionHeading from '@/components/SectionHeading';
 import type { LedgerEvent } from '@/types/domain';
 
@@ -36,7 +37,7 @@ export default function LedgerPage() {
   const [verifying, setVerifying] = useState(false);
 
   async function load() {
-    const res = await fetch(`/api/projects/${id}/ledger?limit=100`);
+    const res = await apiFetch(`/api/projects/${id}/ledger?limit=100`);
     const data = await res.json();
     setEvents(data.events ?? []);
     setTotal(data.total ?? 0);
@@ -45,7 +46,7 @@ export default function LedgerPage() {
 
   async function verify() {
     setVerifying(true);
-    const res = await fetch(`/api/projects/${id}/ledger?verify=true&limit=1`);
+    const res = await apiFetch(`/api/projects/${id}/ledger?verify=true&limit=1`);
     const data = await res.json();
     setIntegrity(data.integrity);
     setVerifying(false);

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { apiFetch } from '@/lib/apiFetch';
 import SectionHeading from '@/components/SectionHeading';
 import Badge from '@/components/Badge';
 import type { Contribution, Participant, ContributionType } from '@/types/domain';
@@ -20,9 +21,9 @@ export default function ContributionsPage() {
 
   async function load() {
     const [contribRes, partRes, typeRes] = await Promise.all([
-      fetch(`/api/projects/${id}/contributions`),
-      fetch(`/api/projects/${id}/participants`),
-      fetch('/api/contribution-types'),
+      apiFetch(`/api/projects/${id}/contributions`),
+      apiFetch(`/api/projects/${id}/participants`),
+      apiFetch('/api/contribution-types'),
     ]);
     const [contribs, parts, typeList] = await Promise.all([contribRes.json(), partRes.json(), typeRes.json()]);
     setContributions(Array.isArray(contribs) ? contribs : []);
@@ -36,7 +37,7 @@ export default function ContributionsPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    await fetch(`/api/projects/${id}/contributions`, {
+    await apiFetch(`/api/projects/${id}/contributions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...form, amount: Number(form.amount) }),
@@ -111,7 +112,7 @@ export default function ContributionsPage() {
                 placeholder={selectedType?.unit ?? 'hours, days, USD…'}
               />
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
               <input
                 value={form.description}
@@ -127,7 +128,7 @@ export default function ContributionsPage() {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
             </div>
-            <div className="flex items-end justify-end gap-3">
+            <div className="flex items-center justify-end gap-3 sm:items-end">
               <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-gray-600">Cancel</button>
               <button type="submit" disabled={saving} className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
                 {saving ? 'Recording…' : 'Record'}
