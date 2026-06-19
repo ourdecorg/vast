@@ -6,9 +6,9 @@ import SectionHeading from '@/components/SectionHeading';
 import Badge from '@/components/Badge';
 import type { Participant, Archetype } from '@/types/domain';
 
-type ParticipantForm = { name: string; email: string; bio: string; archetype_ids: string[] };
+type ParticipantForm = { name: string; email: string; phone: string; bio: string; archetype_ids: string[] };
 
-const EMPTY_FORM: ParticipantForm = { name: '', email: '', bio: '', archetype_ids: [] };
+const EMPTY_FORM: ParticipantForm = { name: '', email: '', phone: '', bio: '', archetype_ids: [] };
 
 export default function ParticipantsPage() {
   const { id } = useParams<{ id: string }>();
@@ -67,6 +67,7 @@ export default function ParticipantsPage() {
     setEditForm({
       name: p.name,
       email: p.email ?? '',
+      phone: p.phone ?? '',
       bio: p.bio ?? '',
       archetype_ids: (p.archetypes ?? []).map(a => a.id),
     });
@@ -155,6 +156,7 @@ export default function ParticipantsPage() {
                     <div>
                       <h3 className="font-semibold text-gray-900">{p.name}</h3>
                       {p.email && <p className="text-xs text-gray-400 mt-0.5">{p.email}</p>}
+                      {p.phone && <p className="text-xs text-gray-400 mt-0.5">{p.phone}</p>}
                     </div>
                     <div className="flex gap-2 shrink-0 ml-2">
                       <button
@@ -220,6 +222,14 @@ function ParticipantFields({
           <input
             type="email" value={form.email}
             onChange={e => onChange({ ...form, email: e.target.value })}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-700 mb-1">Phone</label>
+          <input
+            type="tel" value={form.phone}
+            onChange={e => onChange({ ...form, phone: e.target.value })}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
           />
         </div>

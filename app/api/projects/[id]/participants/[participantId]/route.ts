@@ -7,7 +7,7 @@ type RouteParams = { params: Promise<{ id: string; participantId: string }> };
 
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
   const { id: projectId, participantId } = await params;
-  const { name, email, bio, archetype_ids } = await req.json();
+  const { name, email, phone, bio, archetype_ids } = await req.json();
 
   if (!name) return NextResponse.json({ error: 'name is required' }, { status: 400 });
 
@@ -15,7 +15,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
   const { data, error } = await db
     .from('participants')
-    .update({ name, email: email || null, bio: bio || null })
+    .update({ name, email: email || null, phone: phone || null, bio: bio || null })
     .eq('id', participantId)
     .eq('project_id', projectId)
     .select()

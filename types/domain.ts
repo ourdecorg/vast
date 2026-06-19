@@ -75,6 +75,7 @@ export interface Participant {
   project_id: string;
   name: string;
   email?: string;
+  phone?: string;
   bio?: string;
   archetypes?: Archetype[];
   created_at: string;

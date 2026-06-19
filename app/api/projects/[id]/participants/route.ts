@@ -40,7 +40,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: projectId } = await params;
   const body = await req.json();
-  const { name, email, bio, archetype_ids } = body;
+  const { name, email, phone, bio, archetype_ids } = body;
 
   if (!name) return NextResponse.json({ error: 'name is required' }, { status: 400 });
 
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const { data: participant, error } = await db
     .from('participants')
-    .insert({ project_id: projectId, name, email, bio })
+    .insert({ project_id: projectId, name, email, phone, bio })
     .select()
     .single();
 
