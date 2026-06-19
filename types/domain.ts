@@ -216,12 +216,13 @@ export type ContributionReactionType = 'emoji' | 'reply';
 export interface ContributionReaction {
   id: string;
   contribution_id: string;
-  telegram_user_id: number;
+  telegram_user_id?: number;
   telegram_username?: string;
   reaction_type: ContributionReactionType;
-  emoji?: string;        // set when reaction_type = 'emoji'
-  reply_text?: string;   // set when reaction_type = 'reply'
+  emoji?: string;
+  reply_text?: string;
   telegram_message_id?: number;
+  web_user_email?: string;
   created_at: string;
 }
 
