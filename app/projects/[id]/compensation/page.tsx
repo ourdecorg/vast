@@ -113,7 +113,7 @@ export default function CompensationPage() {
       {showForm && (
         <div className="mb-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <h3 className="font-semibold text-gray-900 mb-4">New Compensation Rule</h3>
-          <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Participant *</label>
               <select
@@ -205,7 +205,7 @@ export default function CompensationPage() {
       <div className="mb-8 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200 p-6">
         <h2 className="font-semibold text-gray-900 mb-1">Revenue Distribution Simulator</h2>
         <p className="text-xs text-gray-500 mb-4">Enter a hypothetical gross revenue amount to see how it would be distributed across all rules.</p>
-        <div className="flex gap-3 items-end">
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
           <div className="flex-1">
             <label className="block text-xs font-medium text-gray-700 mb-1">Hypothetical Revenue ({currency})</label>
             <input
@@ -268,7 +268,8 @@ export default function CompensationPage() {
             {items.length === 0 ? (
               <p className="px-5 py-8 text-sm text-gray-400 text-center">No rules defined.</p>
             ) : (
-              <table className="w-full text-sm">
+              <div className="overflow-x-auto">
+              <table className="w-full text-sm min-w-[480px]">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
                     <th className="text-left px-4 py-3 font-medium text-gray-600">Participant</th>
@@ -297,6 +298,7 @@ export default function CompensationPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         ))}

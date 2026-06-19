@@ -96,11 +96,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* Top bar */}
       <header className="h-10 bg-white border-b border-gray-100 flex items-center justify-between px-4 shrink-0">
         <span className="text-xs font-bold tracking-widest text-indigo-600">VAST</span>
-        <div className="flex items-center gap-4">
-          <span className="text-xs text-gray-400">{session.user.email}</span>
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="text-xs text-gray-400 truncate max-w-[140px] sm:max-w-none">{session.user.email}</span>
           <button
             onClick={signOut}
-            className="text-xs text-gray-400 hover:text-gray-700 transition-colors"
+            className="text-xs text-gray-400 hover:text-gray-700 transition-colors shrink-0"
           >
             Sign out
           </button>

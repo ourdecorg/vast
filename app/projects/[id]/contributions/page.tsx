@@ -66,7 +66,7 @@ export default function ContributionsPage() {
       {showForm && (
         <div className="mb-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <h3 className="font-semibold text-gray-900 mb-4">New Contribution</h3>
-          <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Participant *</label>
               <select
@@ -141,7 +141,8 @@ export default function ContributionsPage() {
         <div className="text-center py-20 text-gray-400">No contributions recorded yet.</div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[600px]">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="text-left px-4 py-3 font-medium text-gray-600">Participant</th>
@@ -176,6 +177,7 @@ export default function ContributionsPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

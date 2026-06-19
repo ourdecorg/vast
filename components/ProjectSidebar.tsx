@@ -18,7 +18,7 @@ export default function ProjectSidebar({ projectId, projectName }: { projectId: 
   const base = `/projects/${projectId}`;
 
   return (
-    <aside className="w-56 shrink-0 bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+    <aside className="hidden md:flex w-56 shrink-0 bg-gray-900 text-gray-100 min-h-full flex-col">
       <div className="px-4 py-5 border-b border-gray-700">
         <Link href="/" className="text-xs text-gray-400 hover:text-white">← All Projects</Link>
         <p className="mt-2 text-sm font-semibold leading-tight text-white truncate">{projectName}</p>

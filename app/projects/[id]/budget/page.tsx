@@ -81,7 +81,7 @@ export default function BudgetPage() {
       {/* Edit form */}
       {editing && (
         <div className="mb-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-          <form onSubmit={handleSave} className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSave} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Total Budget</label>
               <input
@@ -149,7 +149,7 @@ export default function BudgetPage() {
                 style={{ width: `${Math.min(spentPct, 100)}%` }}
               />
             </div>
-            <div className="mt-4 flex gap-6 text-sm text-gray-600">
+            <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
               <div><span className="font-medium">{fmt(unallocated)}</span> <span className="text-gray-400">unallocated</span></div>
               <div><span className="font-medium">{fmt(remaining)}</span> <span className="text-gray-400">unspent (of allocated)</span></div>
             </div>

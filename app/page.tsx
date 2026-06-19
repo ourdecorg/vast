@@ -62,19 +62,19 @@ export default function ProjectsPage() {
             <h1 className="text-xl font-bold tracking-tight">VAST</h1>
             <p className="text-xs text-gray-400">Value Attribution &amp; Sharing Toolkit</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <button
               onClick={handleSeed}
               disabled={seeding}
-              className="px-3 py-1.5 text-sm rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50 transition-colors"
+              className="px-3 py-1.5 text-xs sm:text-sm rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50 transition-colors"
             >
-              {seeding ? 'Seeding…' : '▶ Load Demo'}
+              {seeding ? 'Seeding…' : '▶ Demo'}
             </button>
             <button
               onClick={() => setShowForm(true)}
-              className="px-3 py-1.5 text-sm rounded-lg bg-indigo-500 hover:bg-indigo-400 transition-colors"
+              className="px-3 py-1.5 text-xs sm:text-sm rounded-lg bg-indigo-500 hover:bg-indigo-400 transition-colors"
             >
-              + New Project
+              + New
             </button>
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function ProjectsPage() {
         {showForm && (
           <div className="mb-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <h3 className="font-semibold text-gray-900 mb-4">New Project</h3>
-            <form onSubmit={handleCreate} className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleCreate} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className="block text-xs font-medium text-gray-700 mb-1">Project Name *</label>
                 <input
