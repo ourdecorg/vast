@@ -3,8 +3,12 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase';
 import { appendLedgerEvent } from '@/lib/ledger';
+import { getUserFromRequest } from '@/lib/auth';
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const user = await getUserFromRequest(req);
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const { id } = await params;
   const db = createAdminClient();
 
@@ -19,6 +23,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const user = await getUserFromRequest(req);
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const { id: projectId } = await params;
   const body = await req.json();
   const { participant_id, right_type, percentage, priority, description } = body;
@@ -31,18 +38,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const { data, error } = await db
     .from('rights_allocations')
-    .insert({ project_id: projectId, participant_id, right_type, percentage, priority: priority ?? 0, description })
+    .insert({
+      project_id: projectId, participant_id, right_type, percentage,
+      priority: priority ?? 0, description,
+      created_by: user.email,
+    })
     .select('*, participants ( id, name )')
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   await appendLedgerEvent(projectId, 'rights_allocated', {
-    rights_id: data.id,
-    participant_id,
-    right_type,
-    percentage,
-  });
+    rights_id: data.id, participant_id, right_type, percentage,
+  }, user.email);
 
   return NextResponse.json(data, { status: 201 });
 }

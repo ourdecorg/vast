@@ -3,8 +3,12 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase';
 import { appendLedgerEvent } from '@/lib/ledger';
+import { getUserFromRequest } from '@/lib/auth';
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const user = await getUserFromRequest(req);
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const { id } = await params;
   const db = createAdminClient();
 
@@ -19,6 +23,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const user = await getUserFromRequest(req);
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const { id: projectId } = await params;
   const body = await req.json();
   const { participant_id, compensation_rule_id, amount, currency, payment_date, description } = body;
@@ -30,11 +37,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const db = createAdminClient();
 
   const ledgerEvent = await appendLedgerEvent(projectId, 'payment_made', {
-    participant_id,
-    amount,
-    currency,
-    description,
-  });
+    participant_id, amount, currency, description,
+  }, user.email);
 
   const { data, error } = await db
     .from('payments')
@@ -47,6 +51,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       payment_date: payment_date ?? new Date().toISOString().split('T')[0],
       description,
       ledger_event_id: ledgerEvent.id,
+      created_by: user.email,
     })
     .select('*, participants ( id, name )')
     .single();

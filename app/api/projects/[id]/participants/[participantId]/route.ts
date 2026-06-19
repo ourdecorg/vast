@@ -2,10 +2,14 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase';
+import { getUserFromRequest } from '@/lib/auth';
 
 type RouteParams = { params: Promise<{ id: string; participantId: string }> };
 
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
+  const user = await getUserFromRequest(req);
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const { id: projectId, participantId } = await params;
   const { name, email, phone, bio, archetype_ids } = await req.json();
 
@@ -15,7 +19,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
   const { data, error } = await db
     .from('participants')
-    .update({ name, email: email || null, phone: phone || null, bio: bio || null })
+    .update({ name, email: email || null, phone: phone || null, bio: bio || null, updated_by: user.email })
     .eq('id', participantId)
     .eq('project_id', projectId)
     .select()
@@ -35,7 +39,10 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   return NextResponse.json(data);
 }
 
-export async function DELETE(_req: NextRequest, { params }: RouteParams) {
+export async function DELETE(req: NextRequest, { params }: RouteParams) {
+  const user = await getUserFromRequest(req);
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const { id: projectId, participantId } = await params;
   const db = createAdminClient();
 
