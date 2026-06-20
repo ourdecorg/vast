@@ -74,6 +74,7 @@ export async function sendTelegramMessage(
     chat_id: chatId,
     text,
     parse_mode: options.parseMode ?? 'HTML',
+    disable_web_page_preview: true,
   };
   if (options.replyToMessageId) {
     body.reply_to_message_id = options.replyToMessageId;
