@@ -43,6 +43,21 @@ export default function ContributionsPage() {
 
   useEffect(() => { load(); }, [id]);
 
+  // Auto-open reaction panel when URL contains #c-{contributionId}
+  useEffect(() => {
+    if (!contributions.length) return;
+    const match = window.location.hash.match(/^#c-(.+)$/);
+    if (!match) return;
+    const targetId = match[1];
+    if (!contributions.find(c => c.id === targetId)) return;
+    setExpandedId(targetId);
+    loadReactions(targetId);
+    setTimeout(() => {
+      document.getElementById(`c-${targetId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById(`comment-input-${targetId}`)?.focus();
+    }, 150);
+  }, [contributions]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -297,6 +312,7 @@ export default function ContributionsPage() {
                                 </div>
                                 <div className="flex gap-2">
                                   <input
+                                    id={`comment-input-${c.id}`}
                                     value={commentText}
                                     onChange={e => setCommentText(e.target.value)}
                                     onKeyDown={e => { if (e.key === 'Enter') handleComment(c.id); }}
