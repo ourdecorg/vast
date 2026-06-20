@@ -177,6 +177,7 @@ export function formatContributionAnnouncement(contribution: {
   description?: string;
   amount: number;
   unit?: string;
+  addedByEmail?: string;
 }): string {
   const who = contribution.telegramUsername
     ? `@${contribution.telegramUsername}`
@@ -192,11 +193,28 @@ export function formatContributionAnnouncement(contribution: {
     `📋 סוג: ${contribution.typeName}`,
     contribution.description ? `💬 ${contribution.description}` : null,
     `📊 ערך: ${valueStr}`,
+    contribution.addedByEmail ? `🌐 נרשם ע"י ${contribution.addedByEmail}` : null,
     '',
     '<i>הגיבו עם emoji או הודעת תגובה כדי להביע הערכה</i>',
   ]
     .filter((line) => line !== null)
     .join('\n');
+}
+
+export function formatReactionAnnouncement(reaction: {
+  authorEmail: string;
+  contributionParticipantName: string;
+  reactionType: 'emoji' | 'reply';
+  emoji?: string | null;
+  replyText?: string | null;
+}): string {
+  if (reaction.reactionType === 'emoji') {
+    return `${reaction.emoji} <b>${reaction.authorEmail}</b> הגיב לתרומת ${reaction.contributionParticipantName}`;
+  }
+  return [
+    `💬 <b>${reaction.authorEmail}</b> הגיב על תרומת ${reaction.contributionParticipantName}:`,
+    reaction.replyText ?? '',
+  ].join('\n');
 }
 
 // ─── User Display ─────────────────────────────────────────────────────────────

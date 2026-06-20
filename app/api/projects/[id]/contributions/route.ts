@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase';
 import { appendLedgerEvent } from '@/lib/ledger';
 import { getUserFromRequest } from '@/lib/auth';
+import { sendTelegramMessage, formatContributionAnnouncement } from '@/lib/telegram';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getUserFromRequest(req);
@@ -68,5 +69,51 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Notify all Telegram chats that are active for this project (fire-and-forget)
+  notifyContributionToChats(db, projectId, data, user.email).catch(err =>
+    console.error('[contributions] Telegram notification failed:', err),
+  );
+
   return NextResponse.json(data, { status: 201 });
+}
+
+async function notifyContributionToChats(
+  db: ReturnType<typeof createAdminClient>,
+  projectId: string,
+  contribution: { id: string; amount: number; unit?: string | null; description?: string | null; participants?: { name: string } | null; contribution_types?: { name: string } | null },
+  addedByEmail: string,
+) {
+  const { data: rows } = await db
+    .from('contributions')
+    .select('telegram_chat_id')
+    .eq('project_id', projectId)
+    .not('telegram_chat_id', 'is', null)
+    .neq('id', contribution.id);
+
+  const chatIds = [...new Set((rows ?? []).map(r => r.telegram_chat_id as number).filter(Boolean))];
+  if (!chatIds.length) return;
+
+  const message = formatContributionAnnouncement({
+    participantName: contribution.participants?.name ?? '—',
+    typeName: contribution.contribution_types?.name ?? 'כללי',
+    description: contribution.description ?? undefined,
+    amount: Number(contribution.amount),
+    unit: contribution.unit ?? undefined,
+    addedByEmail,
+  });
+
+  for (const chatId of chatIds) {
+    try {
+      const sent = await sendTelegramMessage(chatId, message);
+      // Save message_id on the first chat so Telegram reactions can be linked back
+      await db
+        .from('contributions')
+        .update({ telegram_message_id: sent.message_id, telegram_chat_id: chatId })
+        .eq('id', contribution.id)
+        .is('telegram_message_id', null);
+    } catch (err) {
+      console.error(`[contributions] Failed to notify chat ${chatId}:`, err);
+    }
+  }
 }
