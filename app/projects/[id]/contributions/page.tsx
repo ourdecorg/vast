@@ -209,7 +209,7 @@ export default function ContributionsPage() {
               <tbody>
                 {contributions.map(c => (
                   <>
-                    <tr key={c.id} className={`border-t border-gray-50 hover:bg-gray-50/50 ${expandedId === c.id ? 'bg-indigo-50/30' : ''}`}>
+                    <tr key={c.id} id={`c-${c.id}`} className={`border-t border-gray-50 hover:bg-gray-50/50 ${expandedId === c.id ? 'bg-indigo-50/30' : ''}`}>
                       <td className="px-4 py-3 font-medium text-gray-900">{c.participants?.name ?? '—'}</td>
                       <td className="px-4 py-3 text-gray-700">{c.contribution_types?.name ?? '—'}</td>
                       <td className="px-4 py-3">

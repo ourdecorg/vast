@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/auth';
-import { sendTelegramMessage, formatReactionAnnouncement } from '@/lib/telegram';
+import { sendTelegramMessage, formatReactionAnnouncement, contributionUrl } from '@/lib/telegram';
 
 type Params = { params: Promise<{ id: string; contributionId: string }> };
 
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   const user = await getUserFromRequest(req);
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { contributionId } = await params;
+  const { id: projectId, contributionId } = await params;
   const body = await req.json();
   const { reaction_type, emoji, reply_text } = body;
 
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Reply to the Telegram message for this contribution (fire-and-forget)
-  notifyReactionToTelegram(db, contributionId, data, user.email).catch(err =>
+  notifyReactionToTelegram(db, projectId, contributionId, data, user.email).catch(err =>
     console.error('[reactions] Telegram notification failed:', err),
   );
 
@@ -67,6 +67,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 
 async function notifyReactionToTelegram(
   db: ReturnType<typeof createAdminClient>,
+  projectId: string,
   contributionId: string,
   reaction: { reaction_type: string; emoji?: string | null; reply_text?: string | null },
   authorEmail: string,
@@ -90,6 +91,7 @@ async function notifyReactionToTelegram(
     reactionType: reaction.reaction_type as 'emoji' | 'reply',
     emoji: reaction.emoji,
     replyText: reaction.reply_text,
+    contributionUrl: contributionUrl(projectId, contributionId),
   });
 
   await sendTelegramMessage(chatId, text, { replyToMessageId: messageId });

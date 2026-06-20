@@ -178,6 +178,7 @@ export function formatContributionAnnouncement(contribution: {
   amount: number;
   unit?: string;
   addedByEmail?: string;
+  contributionUrl?: string;
 }): string {
   const who = contribution.telegramUsername
     ? `@${contribution.telegramUsername}`
@@ -195,6 +196,7 @@ export function formatContributionAnnouncement(contribution: {
     `📊 ערך: ${valueStr}`,
     contribution.addedByEmail ? `🌐 נרשם ע"י ${contribution.addedByEmail}` : null,
     '',
+    contribution.contributionUrl ? `🔗 <a href="${contribution.contributionUrl}">פתח ב-VAST</a>` : null,
     '<i>הגיבו עם emoji או הודעת תגובה כדי להביע הערכה</i>',
   ]
     .filter((line) => line !== null)
@@ -207,14 +209,25 @@ export function formatReactionAnnouncement(reaction: {
   reactionType: 'emoji' | 'reply';
   emoji?: string | null;
   replyText?: string | null;
+  contributionUrl?: string;
 }): string {
+  const link = reaction.contributionUrl
+    ? `\n🔗 <a href="${reaction.contributionUrl}">פתח ב-VAST</a>`
+    : '';
+
   if (reaction.reactionType === 'emoji') {
-    return `${reaction.emoji} <b>${reaction.authorEmail}</b> הגיב לתרומת ${reaction.contributionParticipantName}`;
+    return `${reaction.emoji} <b>${reaction.authorEmail}</b> הגיב לתרומת ${reaction.contributionParticipantName}${link}`;
   }
   return [
     `💬 <b>${reaction.authorEmail}</b> הגיב על תרומת ${reaction.contributionParticipantName}:`,
     reaction.replyText ?? '',
-  ].join('\n');
+    link,
+  ].filter(Boolean).join('\n');
+}
+
+export function contributionUrl(projectId: string, contributionId: string): string {
+  const base = process.env.NEXTAUTH_URL ?? '';
+  return `${base}/projects/${projectId}/contributions#c-${contributionId}`;
 }
 
 // ─── User Display ─────────────────────────────────────────────────────────────

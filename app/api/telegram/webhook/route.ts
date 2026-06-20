@@ -9,6 +9,7 @@ import {
   editMessageWithKeyboard,
   answerCallbackQuery,
   formatContributionAnnouncement,
+  contributionUrl,
   displayName,
   type TelegramUpdate,
   type TelegramMessage,
@@ -385,6 +386,7 @@ async function handleConfirm(
     description: session.description ?? undefined,
     amount: session.amount!,
     unit: session.unit ?? undefined,
+    contributionUrl: contributionUrl(projectId, contribution.id),
   });
 
   const sentMsg = await sendTelegramMessage(chatId, announcement);

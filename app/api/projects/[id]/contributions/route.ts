@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase';
 import { appendLedgerEvent } from '@/lib/ledger';
 import { getUserFromRequest } from '@/lib/auth';
-import { sendTelegramMessage, formatContributionAnnouncement } from '@/lib/telegram';
+import { sendTelegramMessage, formatContributionAnnouncement, contributionUrl } from '@/lib/telegram';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getUserFromRequest(req);
@@ -101,6 +101,7 @@ async function notifyContributionToChats(
     amount: Number(contribution.amount),
     unit: contribution.unit ?? undefined,
     addedByEmail,
+    contributionUrl: contributionUrl(projectId, contribution.id),
   });
 
   for (const chatId of chatIds) {
