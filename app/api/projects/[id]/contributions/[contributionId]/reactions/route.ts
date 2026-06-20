@@ -81,7 +81,8 @@ async function notifyReactionToTelegram(
   const messageId = contrib?.telegram_message_id as number | null;
   if (!chatId || !messageId) return;
 
-  const participantName = (contrib as { participants?: { name: string } | null }).participants?.name ?? '—';
+  const participants = contrib?.participants as { name: string }[] | { name: string } | null | undefined;
+  const participantName = (Array.isArray(participants) ? participants[0]?.name : participants?.name) ?? '—';
 
   const text = formatReactionAnnouncement({
     authorEmail,
