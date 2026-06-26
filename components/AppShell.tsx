@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import Link from 'next/link';
@@ -25,6 +26,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [systemRole, setSystemRole] = useState<SystemRole>('USER');
   const [loading, setLoading] = useState(true);
+  const roleFetched = useRef(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -36,21 +38,26 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_ev, s) => {
       setSession(s);
+      // Reset role fetch flag on sign-out so it re-fetches on next sign-in
+      if (!s) {
+        roleFetched.current = false;
+        setSystemRole('USER');
+      }
     });
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch system role once session is established
+  // Fetch system role exactly once per login session
   useEffect(() => {
-    if (!session) { setSystemRole('USER'); return; }
-    apiFetch('/api/admin/users')
+    if (!session || roleFetched.current) return;
+    roleFetched.current = true;
+
+    apiFetch('/api/me')
       .then(res => res.ok ? res.json() : null)
-      .then(users => {
-        if (!Array.isArray(users)) { setSystemRole('USER'); return; }
-        const me = users.find((u: { id: string }) => u.id === session.user.id);
-        setSystemRole(me?.system_role === 'OWNER' ? 'OWNER' : 'USER');
+      .then(data => {
+        if (data?.system_role) setSystemRole(data.system_role);
       })
-      .catch(() => setSystemRole('USER'));
+      .catch(() => {});
   }, [session]);
 
   // Redirect to /login when not authenticated
@@ -64,6 +71,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }, [loading, session, pathname]);
 
   async function signOut() {
+    roleFetched.current = false;
+    setSystemRole('USER');
     const supabase = getSupabaseClient();
     await supabase.auth.signOut();
     router.replace('/login');
