@@ -1,4 +1,4 @@
--- Contribution events: planned sessions where multiple participants contribute
+-- Contribution events: planned sessions where multiple participants contribute.
 -- e.g. a film shooting day, a workshop, a hackathon sprint.
 
 create table if not exists contribution_events (
