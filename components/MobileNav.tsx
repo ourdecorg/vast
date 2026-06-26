@@ -6,7 +6,8 @@ import { usePathname } from 'next/navigation';
 const NAV = [
   { href: '',               label: 'Overview',  icon: '⬛' },
   { href: '/participants',  label: 'People',    icon: '👥' },
-  { href: '/contributions', label: 'Log',       icon: '🔧' },
+  { href: '/contributions',       label: 'Log',    icon: '🔧' },
+  { href: '/contribution-events', label: 'Events', icon: '🎬' },
   { href: '/budget',        label: 'Budget',    icon: '💰' },
   { href: '/compensation',  label: 'Rules',     icon: '📋' },
   { href: '/fairness',      label: 'Fairness',  icon: '⚖️' },

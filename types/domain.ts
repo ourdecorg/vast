@@ -214,6 +214,33 @@ export interface RevenueEvent {
   created_at: string;
 }
 
+// ─── Contribution Events ─────────────────────────────────────────────────────
+
+export type ContributionEventStatus = 'planned' | 'occurred' | 'cancelled';
+
+export interface ContributionEvent {
+  id: string;
+  project_id: string;
+  event_date: string; // ISO date string YYYY-MM-DD
+  description: string;
+  location?: string;
+  status: ContributionEventStatus;
+  contribution_type_id?: string;
+  default_amount?: number;
+  created_at: string;
+  created_by?: string;
+  // Joined fields
+  contribution_types?: { id: string; name: string; unit?: string };
+  contribution_event_participants?: { participant_id: string; participants: { id: string; name: string } }[];
+}
+
+export interface ContributionEventParticipant {
+  id: string;
+  contribution_event_id: string;
+  participant_id: string;
+  participants?: { id: string; name: string };
+}
+
 // ─── Telegram Integration ────────────────────────────────────────────────────
 
 export interface ParticipantTelegramAccount {
