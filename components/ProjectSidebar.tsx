@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV = [
-  { href: '',            label: 'Dashboard',       icon: '⬛' },
-  { href: '/budget',     label: 'Budget',          icon: '💰' },
-  { href: '/participants',label: 'Participants',   icon: '👥' },
-  { href: '/contributions',label: 'Contributions', icon: '🔧' },
-  { href: '/compensation',label: 'Compensation',   icon: '📋' },
-  { href: '/ledger',     label: 'Ledger',          icon: '📜' },
-  { href: '/fairness',   label: 'Fairness Map',    icon: '⚖️' },
+  { href: '',              label: 'Dashboard',    icon: '⬛' },
+  { href: '/budget',       label: 'Budget',       icon: '💰' },
+  { href: '/participants', label: 'Participants', icon: '👥' },
+  { href: '/contributions',label: 'Contributions',icon: '🔧' },
+  { href: '/compensation', label: 'Compensation', icon: '📋' },
+  { href: '/ledger',       label: 'Ledger',       icon: '📜' },
+  { href: '/fairness',     label: 'Fairness Map', icon: '⚖️' },
+  { href: '/members',      label: 'Members',      icon: '🔑' },
 ];
 
 export default function ProjectSidebar({ projectId, projectName }: { projectId: string; projectName: string }) {

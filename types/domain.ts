@@ -1,3 +1,17 @@
+// Permission roles
+export type SystemRole = 'OWNER' | 'USER';
+export type ProjectRole = 'PROJECT_ADMIN' | 'USER';
+
+export interface ProjectMember {
+  id: string;
+  project_id: string;
+  user_id: string;
+  email: string;
+  role: ProjectRole;
+  created_at: string;
+  created_by?: string;
+}
+
 // Core value categories — what someone can contribute to a project
 export type ContributionCategory =
   | 'time'

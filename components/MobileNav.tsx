@@ -11,6 +11,7 @@ const NAV = [
   { href: '/compensation',  label: 'Rules',     icon: '📋' },
   { href: '/fairness',      label: 'Fairness',  icon: '⚖️' },
   { href: '/ledger',        label: 'Ledger',    icon: '📜' },
+  { href: '/members',       label: 'Members',   icon: '🔑' },
 ];
 
 export default function MobileNav({ projectId }: { projectId: string }) {
